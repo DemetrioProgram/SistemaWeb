@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" 
+	template="/templates/modelo.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/menu.xhtml" />
+	</ui:define>
+
+	<ui:define name="Conteudo">
+		<h:form id="frmprodutos">
+			<p:dataTable id="tbprodutos"
+				empetyMessage="Nenhum Registro Encontrado"
+				value="#{produtosBean.produtos}" var="item" paginator="true"
+				rows="5">
+				<f:facet name="header"> Lista de Produtos</f:facet>
+
+				<p:column headerText="Código" sortBy="#{item.codigo}"
+					filterBy="#{produtosBean.produto.codigo}">
+					<h:outputText value="#{item.codigo}" />
+				</p:column>
+
+
+				<p:column headerText="Descrição" sortBy="#{item.descricao}"
+					filterBy="#{item.descricao}">
+					<h:outputText value="#{item.descricao}" />
+				</p:column>
+
+				<p:column headerText="Quantidade" sortBy="#{item.quantidade}"
+					filterBy="#{produtosBean.produto.quantidade}">
+					<h:outputText value="#{item.quantidade}" />
+				</p:column>
+
+				<p:column headerText="Preço" sortBy="#{item.preco}"
+					filterBy="#{produtosBean.produto.preco}">
+					<h:outputText value="#{item.preco}" />
+				</p:column>
+
+				<p:column headerText="Código do Fornecedor"
+					sortBy="#{produtosBean.produto.fornecedor.codigo}"
+					filterBy="#{produtosBean.produto.fornecedor.codigo}">
+					<h:outputText value="#{item.fornecedor.codigo}" />
+				</p:column>
+
+				<p:column headerText="Descrição do Fornecedor"
+					sortBy="#{item.fornecedor.descricao}"
+					filterBy="#{item.fornecedor.descricao}">
+					<h:outputText value="#{item.fornecedor.descricao}" />
+				</p:column>
+				
+				<p:column headerText="Opções">
+
+					<p:commandButton icon="ui-icon-pencil"
+						oncomplete="PF('dlgforeditar').show();"
+						update=":formeditar:pnforeditar">
+
+						<f:setPropertyActionListener value="#{item}"
+							target="#{produtosBean.produto}"></f:setPropertyActionListener>
+					</p:commandButton>
+
+					<p:commandButton icon="ui-icon-trash"
+						oncomplete="PF('dlgforexcluir').show();"
+						update=":formexcluir:pnforexcluir">
+
+						<f:setPropertyActionListener value="#{item}"
+							target="#{produtosBean.produto}"></f:setPropertyActionListener>
+					</p:commandButton>
+
+				</p:column>
+
+				<f:facet name="footer">
+					<p:commandButton value="Novo" 
+						actionListener="#{produtosBean.prepararNovo}"
+						oncomplete="PF('dlgfornovo').show();"
+						update=":frmnovo:pnfornovo" />
+				</f:facet>
+
+			</p:dataTable>
+
+
+		</h:form>
+
+		<p:dialog widgetVar="dlgfornovo" closable="false" draggable="false"
+			resizable="false" header="Cadastrar Produto" modal="true"
+			appendTo="@(body)">
+
+			<h:form id="frmnovo">
+				<h:panelGrid id="pnfornovo" columns="2">
+					<p:outputLabel value="Descrição" />
+					<h:inputText size="30" maxlength="50"
+						value="#{produtosBean.produto.descricao}" />
+						
+						<p:outputLabel value="Preço" />
+					<h:inputText size="30" maxlength="50"
+						value="#{produtosBean.produto.preco}" />
+						
+						<p:outputLabel value="Quantidade" />
+					<h:inputText size="30" maxlength="50"
+						value="#{produtosBean.produto.quantidade}" />
+
+					<p:outputLabel value="Fornecedor: " />
+					<p:selectOneMenu value="#{produtosBean.produto.fornecedor.codigo}"
+						filter="true">
+						<f:selectItem itemValue="" itemLabel="Selecione um Fornecedor" />
+						<f:selectItems value="#{produtosBean.comboFornecedores}" var="item"
+							itemValue="#{item.codigo}" itemLabel="#{item.descricao}">
+						</f:selectItems>
+					</p:selectOneMenu>
+
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+
+					<p:commandButton value="Gravar"
+						actionListener="#{produtosBean.novo}"
+						oncomplete="PF('dlgfornovo').hide();"
+						update=":frmprodutos:tbprodutos :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgfornovo').hide();" />
+
+				</h:panelGrid>
+
+			</h:form>
+		</p:dialog>
+		
+		<p:dialog widgetVar="dlgforeditar" closable="false"
+			draggable="false" resizable="false" header="Editar "
+			modal="true" appendTo="@(body)">
+			<h:form id="formeditar">
+
+				<h:panelGrid id="pnforeditar" columns="2">
+					<h:outputText value="codigo" />
+					<h:outputText value="#{produtosBean.produto.codigo}" />
+					<p:outputLabel value="Descrição: " />
+					<h:inputText size="30" maxlength="50"
+						value="#{produtosBean.produto.descricao}" />
+					<p:outputLabel value="Valor: " />
+					<h:inputText size="30" maxlength="50"
+						value="#{produtosBean.produto.preco}" />
+					<p:outputLabel value="Quantidade: " />
+					<h:inputText size="30" maxlength="50"
+						value="#{produtosBean.produto.quantidade}" />
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Confirmar"
+						actionListener="#{produtosBean.editar}"
+						oncomplete="PF('dlgforeditar').hide();"
+						update=":frmprodutos:tbprodutos :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgforeditar').hide(); PF('tbproduto');" />
+				</h:panelGrid>
+
+			</h:form>
+		</p:dialog>
+		
+		<p:dialog widgetVar="dlgforexcluir" closable="false"
+			draggable="false" resizable="false" header="Excluir Produto"
+			modal="true" appendTo="@(body)">
+			<h:form id="formexcluir">
+
+				<h:panelGrid id="pnforexcluir" columns="2">
+					<h:outputText value="codigo" />
+					<h:outputText value="#{produtosBean.produto.codigo}" />
+					<h:outputText value="Descrição: " />
+					<h:outputText value="#{produtosBean.produto.descricao}" />
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Confirmar"
+						actionListener="#{produtosBean.excluir}"
+						oncomplete="PF('dlgforexcluir').hide();"
+						update=":frmprodutos:tbprodutos :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgforexcluir').hide(); PF('tbproduto');" />
+				</h:panelGrid>
+
+			</h:form>
+		</p:dialog>
+
+	</ui:define>
+
+</ui:composition>
